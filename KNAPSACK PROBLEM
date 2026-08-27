@@ -2,43 +2,34 @@
 #include <vector>
 #include <algorithm>
 
-// Function to solve the 0/1 Knapsack problem using Dynamic Programming
+// Function to solve the 0-1 Knapsack problem
+// Time Complexity: O(N * W), Space Complexity: O(W)
 int knapsack(int W, const std::vector<int>& weights, const std::vector<int>& values, int n) {
-    // Create a 2D DP table initialized to 0
-    // Rows represent items considered (0 to n)
-    // Columns represent knapsack capacities (0 to W)
-    std::vector<std::vector<int>> dp(n + 1, std::vector<int>(W + 1, 0));
+    // dp array stores the maximum value for every capacity from 0 to W
+    std::vector<int> dp(W + 1, 0);
 
-    // Build the table in a bottom-up manner
-    for (int i = 1; i <= n; ++i) {
-        for (int w = 1; w <= W; ++w) {
-            // Check if the weight of the current item is less than or equal to the current capacity
-            if (weights[i - 1] <= w) {
-                // Max of:
-                // 1. Including the current item (its value + value of remaining capacity with previous items)
-                // 2. Excluding the current item (value of the same capacity with previous items)
-                dp[i][w] = std::max(values[i - 1] + dp[i - 1][w - weights[i - 1]], dp[i - 1][w]);
-            } else {
-                // Current item cannot be included because it exceeds the current capacity
-                dp[i][w] = dp[i - 1][w];
-            }
+    // Process each item one by one
+    for (int i = 0; i < n; i++) {
+        // Traverse capacity from right to left to prevent using the same item multiple times
+        for (int w = W; w >= weights[i]; w--) {
+            dp[w] = std::max(dp[w], dp[w - weights[i]] + values[i]);
         }
     }
 
-    // The bottom-right cell contains the maximum value for 'n' items and capacity 'W'
-    return dp[n][W];
+    return dp[W];
 }
 
 int main() {
-    // Example inputs
-    std::vector<int> values = {60, 100, 120};
-    std::vector<int> weights = {10, 20, 30};
-    int W = 50; // Total knapsack capacity
+    // Example Dataset
+    std::vector<int> values = {10, 20, 25, 40, 60, 70};
+    std::vector<int> weights = {1, 2, 3, 6, 7, 4};
+    int W = 7; // Maximum weight capacity
     int n = values.size();
 
     int max_value = knapsack(W, weights, values, n);
 
-    std::cout << "Maximum value achievable in Knapsack = " << max_value << std::endl;
+    std::vector<int> elements;
+    std::cout << "Maximum value in Knapsack = " << max_value << std::endl;
 
     return 0;
 }
